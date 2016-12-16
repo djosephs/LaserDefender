@@ -39,7 +39,8 @@ public class PlayerController : MonoBehaviour
 	
 	void KeyControls ()
 	{
-		if (Input.GetKey (KeyCode.LeftArrow)) {			
+		if (Input.GetKey (KeyCode.LeftArrow)) {		
+			print ("left");
 			transform.position += Vector3.left * speed * Time.deltaTime;
 		}
 		if (Input.GetKey (KeyCode.RightArrow)) {
