@@ -9,6 +9,7 @@ public class EnemySpawner : MonoBehaviour
 	public GameObject enemyPrefab;
 	public float speed = .2f;
 	public float padding = .15f;
+	public float spawnDelay = .5f;
 	float xmin;
 	float xmax;
 	private bool isMovingRight = true;
@@ -31,10 +32,41 @@ public class EnemySpawner : MonoBehaviour
 		Vector3 rightmost = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, distance));
 		xmin = leftmost.x;
 		xmax = rightmost.x;
-		
-		
-	
 	}
+		
+	void SpawnUntilFull ()
+	{
+		Transform freePosition = NextFreePosition ();
+		if (freePosition) {
+			GameObject enemy = Instantiate (enemyPrefab, freePosition.position, Quaternion.identity) as GameObject;
+			enemy.transform.parent = freePosition; 
+		}
+		if (NextFreePosition ()) {
+			Invoke ("SpawnUntilFull", spawnDelay);
+		}
+	}
+		
+		
+	Transform NextFreePosition ()
+	{
+		foreach (Transform childPositionGameObject in transform) {
+			if (childPositionGameObject.childCount == 0) {
+				return childPositionGameObject; 
+			}
+		}
+		return null;
+	}
+	
+	bool AllMembersDead ()
+	{
+		foreach (Transform childPositionGameObject in transform) {
+			if (childPositionGameObject.childCount > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	
 	public void OnDrawGizmos ()
 	{
@@ -62,24 +94,11 @@ public class EnemySpawner : MonoBehaviour
 		}
 		if (AllMembersDead ()) {
 			Debug.Log ("Empty formation");
-			SpawnEnemies ();
+			SpawnUntilFull ();
 		}
 	}
 
-	Transform NextFreePosition ()
-	{
-	
-		
-	}
 
-	bool AllMembersDead ()
-	{
-		foreach (Transform childPositionGameObject in transform) {
-			if (childPositionGameObject.childCount > 0) {
-				return false;
-			}
-		}
-		return true;
-	}
+
 
 }
